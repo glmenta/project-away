@@ -1,9 +1,12 @@
-require('dotenv').config();
-const { initializeApp } = require("firebase/app");
-const { getAuth } = require("firebase/auth");
-const { getFirestore } = require("firebase/firestore");
+//require('dotenv').config();
+import dotenv from 'dotenv'
+dotenv.config()
+
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 const {FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_PROJECT_ID, FIREBASE_STORAGE_BUCKET, FIREBASE_MESSAGING_SENDER_ID, FIREBASE_APP_ID, FIREBASE_MEASUREMENT_ID} = process.env;
-console.log('FIREBASE_API_KEY:', process.env.FIREBASE_API_KEY);
 
 const firebaseConfig = {
     apiKey: FIREBASE_API_KEY,
@@ -14,10 +17,22 @@ const firebaseConfig = {
     appId: FIREBASE_APP_ID,
     measurementId: FIREBASE_MEASUREMENT_ID
 }
-console.log('firebaseConfig', firebaseConfig)
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
 
-module.exports = { db, auth };
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+
+const temp = async () => {
+    try {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        querySnapshot.forEach((doc) => {
+            console.log(doc.id, " => ", doc.data());
+        });
+    } catch (error) {
+        console.error('error', error)
+    }
+
+}
+temp()
+
+// module.exports = { db, auth };
