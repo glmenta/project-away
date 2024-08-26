@@ -1,22 +1,38 @@
 //require('dotenv').config();
+import dotenv from 'dotenv'
+dotenv.config()
 
-const { initializeApp } = require("firebase/app");
-const { getAuth } = require("firebase/auth");
-const { getFirestore } = require("firebase/firestore");
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
+const {FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_PROJECT_ID, FIREBASE_STORAGE_BUCKET, FIREBASE_MESSAGING_SENDER_ID, FIREBASE_APP_ID, FIREBASE_MEASUREMENT_ID} = process.env;
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDxxdMUwEbNAuE3ANeaQ-0uK4xwKxw3kLA",
-    authDomain: "project-away-32a6f.firebaseapp.com",
-    projectId: "project-away-32a6f",
-    storageBucket: "project-away-32a6f.appspot.com",
-    messagingSenderId: "920785747193",
-    appId: "1:920785747193:web:12345c64796cefc58bf628",
-    measurementId: "G-VXYYLQZ74J"
-};
-console.log('firebaseConfig', firebaseConfig)
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+    apiKey: FIREBASE_API_KEY,
+    authDomain: FIREBASE_AUTH_DOMAIN,
+    projectId: FIREBASE_PROJECT_ID,
+    storageBucket: FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
+    appId: FIREBASE_APP_ID,
+    measurementId: FIREBASE_MEASUREMENT_ID
+}
 
-module.exports = { db, auth };
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+
+const temp = async () => {
+    try {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        querySnapshot.forEach((doc) => {
+            console.log(doc.id, " => ", doc.data());
+        });
+    } catch (error) {
+        console.error('error', error)
+    }
+
+}
+temp()
+
+// module.exports = { db, auth };
