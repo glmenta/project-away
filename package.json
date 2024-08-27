@@ -5,7 +5,7 @@
     "firebase": "^10.13.0"
   },
   "scripts": {
-    "test": "node src/index.js"
+    "test": "node firebase/index.js"
   },
   "type": "module"
 }
