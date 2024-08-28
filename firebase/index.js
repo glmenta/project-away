@@ -5,7 +5,6 @@ dotenv.config()
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-import { collection, getDocs } from 'firebase/firestore';
 const {FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_PROJECT_ID, FIREBASE_STORAGE_BUCKET, FIREBASE_MESSAGING_SENDER_ID, FIREBASE_APP_ID, FIREBASE_MEASUREMENT_ID} = process.env;
 
 const firebaseConfig = {
@@ -19,20 +18,7 @@ const firebaseConfig = {
 }
 
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-const temp = async () => {
-    try {
-        const querySnapshot = await getDocs(collection(db, "users"));
-        querySnapshot.forEach((doc) => {
-            console.log(doc.id, " => ", doc.data());
-        });
-    } catch (error) {
-        console.error('error', error)
-    }
-
-}
-temp()
-
-// module.exports = { db, auth };
+export { app, auth, db }

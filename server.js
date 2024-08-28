@@ -1,13 +1,20 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import userRoutes from './app/backend/routes/userRoutes.js';
+import authRoutes from './app/backend/routes/authRoutes.js';
 
 const app = express();
+app.use(bodyParser.json());
 const port = process.env.PORT || 5000;
 
-app.use(bodyParser.json());
-
 app.use('/api/users', userRoutes);
+app.use('/api/auth', authRoutes);
+
+app.get('/test', (req, res) => {
+    console.log("Test route accessed");
+    res.send('Hello World!');
+});
+
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
