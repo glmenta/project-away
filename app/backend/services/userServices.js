@@ -6,12 +6,14 @@ import { setLogLevel } from "firebase/firestore";
 setLogLevel('debug');
 
 export const addUserToDB = async (user) => {
-    console.log('hello from db');
+    console.log('Adding user to Firestore database...');
     try {
+        // Add user to the "users" collection in Firestore
         const docRef = await addDoc(collection(db, "users"), user);
-        console.log("Document written with ID: ", docRef.id);
+        console.log("Document written with ID:", docRef.id);
     } catch (error) {
-        console.error("Error adding document: ", error);
+        console.error("Error adding document to Firestore:", error);
+        throw error;  // Re-throw the error so it can be caught in registerUser
     }
 }
 export const getUsersFromDB = async () => {

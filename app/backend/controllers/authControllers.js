@@ -3,19 +3,29 @@ import { auth } from "../../../firebase/index.js";
 import { addUserToDB } from "../services/userServices.js";
 
 export const registerUser = async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, username } = req.body;
     try {
+        // Create the user with Firebase Authentication
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        console.log('user', user);
+        console.log('User created:', user);
+
+        // Create user object to save in Firestore
         const userObj = {
             email: user.email,
-            username: req.body.username || 'default'
+            username: username || 'default'
         }
+
+        // Add user to Firestore
         await addUserToDB(userObj);
-        res.send('user created');
+
+        // Send success response
+        res.status(201).send('User created successfully and added to Firestore.');
     } catch (error) {
-        console.error('error', error)
+        console.error('Error creating user or adding to DB:', error);
+
+        // Send error response
+        res.status(500).send('Error creating user or adding to Firestore.');
     }
 }
 
