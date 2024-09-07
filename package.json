@@ -2,7 +2,7 @@
   "dependencies": {
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "firebase": "^10.13.0"
+    "firebase": "^10.13.1"
   },
   "scripts": {
     "test": "node server.js"
