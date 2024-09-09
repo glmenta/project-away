@@ -7,6 +7,7 @@ setLogLevel('debug');
 
 export const addUserToDB = async (user) => {
     console.log('Adding user to Firestore database...');
+    console.log('user: ', user)
     try {
         // Add user to the "users" collection in Firestore
         const docRef = await addDoc(collection(db, "users"), user);

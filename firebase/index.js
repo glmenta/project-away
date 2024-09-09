@@ -31,15 +31,14 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize services
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+export const db = getFirestore(app, 'pa-db');
 
 console.log('Firebase initialized with Firestore and Auth');
 
-// Example Firestore write to check if it's connected properly
 const testConnection = async () => {
     try {
-        const docRef = await addDoc(collection(db, 'test'), {
-            testField: 'This is a test',
+        const docRef = await addDoc(collection(db, 'users'), {
+            testField: 'testing again',
             timestamp: new Date(),
         });
         console.log('Document written with ID: ', docRef.id);
@@ -48,5 +47,4 @@ const testConnection = async () => {
     }
 };
 
-// Call the test function to verify Firestore connection
 testConnection();
