@@ -1,6 +1,6 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../../firebase/index.js";
-import { addUserToDB } from "../services/userServices.js";
+import { addUserToDB, loginUserToDB } from "../services/userServices.js";
 
 export const registerUser = async (req, res) => {
     const { email, password, username } = req.body;
@@ -34,6 +34,7 @@ export const loginUser = async (req, res) => {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
+        await loginUserToDB(email, password);
         console.log('user', user);
         res.send('user logged in');
     } catch (error) {

@@ -3,11 +3,11 @@ import { collection, getDocs, addDoc } from "firebase/firestore";
 import { setLogLevel } from "firebase/firestore";
 
 // Set log level to debug to get more detailed output
-setLogLevel('debug');
+//setLogLevel('debug');
 
 export const addUserToDB = async (user) => {
-    console.log('Adding user to Firestore database...');
-    console.log('user: ', user)
+    // console.log('Adding user to Firestore database...');
+    // console.log('user: ', user)
     try {
         // Add user to the "users" collection in Firestore
         const docRef = await addDoc(collection(db, "users"), user);
@@ -17,8 +17,27 @@ export const addUserToDB = async (user) => {
         throw error;  // Re-throw the error so it can be caught in registerUser
     }
 }
+
+export const loginUserToDB = async (email, password) => {
+    //console.log('hello from db');
+    try {
+        const users = []
+        const querySnapshot = await getDocs(collection(db, "users"));
+        querySnapshot.forEach((doc) => {
+            users.push({
+                id: doc.id,
+                ...doc.data()
+            })
+        });
+        const user = users.find(user => user.email === email && user.password === password);
+        return user
+    } catch (error) {
+        console.error('error', error)
+    }
+}
+
 export const getUsersFromDB = async () => {
-    console.log('hello from db');
+    //console.log('hello from db');
     try {
         const users = []
         const querySnapshot = await getDocs(collection(db, "users"));
