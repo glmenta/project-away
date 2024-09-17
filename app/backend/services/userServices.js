@@ -18,23 +18,24 @@ export const addUserToDB = async (user) => {
     }
 }
 
-export const loginUserToDB = async (email, password) => {
-    //console.log('hello from db');
+export const loginUserToDB = async (email) => {
     try {
-        const users = []
+        const users = [];
         const querySnapshot = await getDocs(collection(db, "users"));
         querySnapshot.forEach((doc) => {
             users.push({
                 id: doc.id,
                 ...doc.data()
-            })
+            });
         });
-        const user = users.find(user => user.email === email && user.password === password);
-        return user
+        // Find the user by email
+        const user = users.find(user => user.email === email);
+        return user || null;
     } catch (error) {
-        console.error('error', error)
+        console.error('Error fetching users from the database:', error);
+        throw new Error('Error fetching user data');
     }
-}
+};
 
 export const getUsersFromDB = async () => {
     //console.log('hello from db');

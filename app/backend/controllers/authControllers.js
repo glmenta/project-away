@@ -30,14 +30,37 @@ export const registerUser = async (req, res) => {
 }
 
 export const loginUser = async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        await loginUserToDB(email, password);
-        console.log('user', user);
-        res.send('user logged in');
-    } catch (error) {
-        console.error('error', error)
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).send({ error: 'Username and password are required' });
     }
-}
+
+    try {
+        // Authenticate with Firebase Authentication
+        const userCredential = await signInWithEmailAndPassword(auth, username, password);
+        const user = userCredential.user;
+
+        // Fetch user data from Firestore after successful authentication
+        const dbUser = await loginUserToDB(username);
+
+        if (!dbUser) {
+            return res.status(404).send({ error: 'User not found in the database' });
+        }
+
+        // Optional: Use bcrypt to check if the password matches (if password is hashed in Firestore)
+        // Assuming the password stored in the database is hashed
+        const passwordMatch = await bcrypt.compare(password, dbUser.password);
+        if (!passwordMatch) {
+            return res.status(401).send({ error: 'Invalid password' });
+        }
+
+        // User is successfully authenticated and found in Firestore
+        console.log('User logged in successfully:', user);
+
+        res.status(200).send({ message: 'User logged in successfully', user: dbUser });
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).send({ error: 'An error occurred while logging in' });
+    }
+};
