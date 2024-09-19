@@ -1,5 +1,5 @@
 import { db } from "../../../firebase/index.js";
-import { collection, getDocs, addDoc } from "firebase/firestore";
+import { collection, getDocs, addDoc, query, where } from "firebase/firestore";
 import { setLogLevel } from "firebase/firestore";
 
 // Set log level to debug to get more detailed output
@@ -18,21 +18,25 @@ export const addUserToDB = async (user) => {
     }
 }
 
-export const loginUserToDB = async (email) => {
+export const loginUserToDB = async (username) => {
     try {
-        const users = [];
-        const querySnapshot = await getDocs(collection(db, "users"));
-        querySnapshot.forEach((doc) => {
-            users.push({
-                id: doc.id,
-                ...doc.data()
-            });
-        });
-        // Find the user by email
-        const user = users.find(user => user.email === email);
-        return user || null;
+        // Create a query to find the user by email directly in Firestore
+        const userQuery = collection(db, "users");
+        const querySnapshot = await getDocs(query(userQuery, where("username", "==", username)));
+
+        if (querySnapshot.empty) {
+            return null; // No user found with that email
+        }
+
+        const userDoc = querySnapshot.docs[0];
+        const user = {
+            id: userDoc.id,
+            ...userDoc.data(),
+        };
+
+        return user;
     } catch (error) {
-        console.error('Error fetching users from the database:', error);
+        console.error('Error fetching user from the database:', error);
         throw new Error('Error fetching user data');
     }
 };
@@ -50,6 +54,21 @@ export const getUsersFromDB = async () => {
             })
         });
         return users
+    } catch (error) {
+        console.error('error', error)
+    }
+}
+
+export const getUserFromDB = async (id) => {
+    try {
+        const userDoc = await getDocs(collection(db, "users"), id);
+        if (userDoc.exists()) {
+            return userDoc.data();
+        } else {
+            return {
+                error: 'User not found'
+            }
+        }
     } catch (error) {
         console.error('error', error)
     }
