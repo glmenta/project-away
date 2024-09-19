@@ -1,6 +1,6 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../../firebase/index.js";
-import { addUserToDB, loginUserToDB } from "../services/userServices.js";
+import { addUserToDB, loginUserToDB, getUsersFromDB, getUserFromDB } from "../services/userServices.js";
 
 export const registerUser = async (req, res) => {
     const { email, password, username } = req.body;
@@ -33,34 +33,37 @@ export const loginUser = async (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
-        return res.status(400).send({ error: 'Username and password are required' });
+        return res.status(400).send({ error: 'Username and password are required.' });
     }
 
     try {
-        // Authenticate with Firebase Authentication
-        const userCredential = await signInWithEmailAndPassword(auth, username, password);
+        // Fetch user data from Firestore to get the email based on the username
+        const dbUser = await loginUserToDB(username);
+        console.log('dbUser', dbUser)
+        if (!dbUser) {
+            return res.status(404).send({ error: 'User not found in the database.' });
+        }
+
+        const email = dbUser.email;
+
+        // Authenticate with Firebase Authentication using the retrieved email
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Fetch user data from Firestore after successful authentication
-        const dbUser = await loginUserToDB(username);
-
-        if (!dbUser) {
-            return res.status(404).send({ error: 'User not found in the database' });
-        }
-
-        // Optional: Use bcrypt to check if the password matches (if password is hashed in Firestore)
-        // Assuming the password stored in the database is hashed
-        const passwordMatch = await bcrypt.compare(password, dbUser.password);
-        if (!passwordMatch) {
-            return res.status(401).send({ error: 'Invalid password' });
-        }
-
-        // User is successfully authenticated and found in Firestore
+        // User is successfully authenticated
         console.log('User logged in successfully:', user);
 
-        res.status(200).send({ message: 'User logged in successfully', user: dbUser });
+        res.status(200).send({ message: 'User logged in successfully' });
     } catch (error) {
         console.error('Login error:', error);
-        res.status(500).send({ error: 'An error occurred while logging in' });
+
+        if (error.code === 'auth/wrong-password') {
+            return res.status(401).send({ error: 'Invalid password' });
+        }
+        if (error.code === 'auth/user-not-found') {
+            return res.status(404).send({ error: 'No user found with this email' });
+        }
+
+        res.status(500).send({ error: 'An error occurred while logging in.' });
     }
 };
