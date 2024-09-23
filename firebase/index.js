@@ -4,6 +4,7 @@ import { initializeApp } from 'firebase/app'; // Correct import
 import { getAuth } from 'firebase/auth'; // Auth import
 import { getFirestore, collection, addDoc } from 'firebase/firestore'; // Firestore import
 import admin from 'firebase-admin';
+import serviceAccount from './project-away-32a6f-firebase-adminsdk-ojyg3-22a6a5e765.json' assert { type: 'json' };
 
 // Destructuring environment variables
 const {
@@ -50,22 +51,43 @@ const testConnection = async () => {
 
 testConnection();
 
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+});
+console.log("Firebase Admin SDK initialized");
+
 auth.onAuthStateChanged(async (user) => {
     if (user) {
-        const token = await user.getIdToken();  // Retrieve the JWT token
-        // Send token to the backend in request headers
-        const response = await fetch('http://localhost:5000/currentUser', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`
+        try {
+            const token = await user.getIdToken();  // Retrieve the JWT token
+            console.log('User token:', token);
+            // Send token to the backend in request headers
+            const response = await fetch('http://localhost:5000/api/current-user', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            // Check if the response is successful (status code 200-299)
+            if (!response.ok) {
+                const errorText = await response.text();  // Read the response as text
+                console.error('Failed to fetch user info from backend:', errorText);
+                return;
             }
-        });
-        const data = await response.json();
-        console.log('Logged in user:', data);
+
+            // Parse the JSON response
+            const data = await response.json();
+            //console.log('Logged in user:', data);
+            return data
+        } catch (error) {
+            console.error('Error during fetch or JSON parsing:', error);
+        }
     } else {
         console.log('No user is logged in');
     }
 });
+
 
 export const authMiddleware = async (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1]; // Extract token from Authorization header

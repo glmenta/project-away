@@ -2,12 +2,7 @@ import { db } from "../../../firebase/index.js";
 import { collection, getDocs, addDoc, query, where } from "firebase/firestore";
 import { setLogLevel } from "firebase/firestore";
 
-// Set log level to debug to get more detailed output
-//setLogLevel('debug');
-
 export const addUserToDB = async (user) => {
-    // console.log('Adding user to Firestore database...');
-    // console.log('user: ', user)
     try {
         // Add user to the "users" collection in Firestore
         const docRef = await addDoc(collection(db, "users"), user);
@@ -19,13 +14,16 @@ export const addUserToDB = async (user) => {
 }
 
 export const loginUserToDB = async (username) => {
+    console.log('hit loginUserToDB', username)
     try {
-        // Create a query to find the user by email directly in Firestore
-        const userQuery = collection(db, "users");
-        const querySnapshot = await getDocs(query(userQuery, where("username", "==", username)));
+        // Query Firestore for a user with the provided username
+        const userQuery = collection(db, 'users');
+        console.log('userQuery', userQuery)
+        const q = query(userQuery, where('username', '==', username));
+        const querySnapshot = await getDocs(q);
 
         if (querySnapshot.empty) {
-            return null; // No user found with that email
+            return null; // No user found with that username
         }
 
         const userDoc = querySnapshot.docs[0];
@@ -61,15 +59,15 @@ export const getUsersFromDB = async () => {
 
 export const getUserFromDB = async (id) => {
     try {
-        const userDoc = await getDocs(collection(db, "users"), id);
+        const userDocRef = doc(db, "users", id); // Create a reference to the user document by UID
+        const userDoc = await getDoc(userDocRef); // Fetch the document
         if (userDoc.exists()) {
-            return userDoc.data();
+            return userDoc.data(); // Return user data if document exists
         } else {
-            return {
-                error: 'User not found'
-            }
+            return { error: 'User not found' }; // Return error if no document is found
         }
     } catch (error) {
-        console.error('error', error)
+        console.error('Error fetching user from Firestore:', error);
+        throw new Error('Error fetching user from database');
     }
-}
+};
