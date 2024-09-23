@@ -51,9 +51,12 @@ export const loginUser = async (req, res) => {
         const user = userCredential.user;
 
         // User is successfully authenticated
-        console.log('User logged in successfully:', user);
+        //console.log('User logged in successfully:', user);
 
-        res.status(200).send({ message: 'User logged in successfully' });
+        if (!user) {
+            return res.status(401).send({ error: 'Invalid credentials' });
+        }
+        res.status(200).send({ message: 'User logged in successfully', user: user });
     } catch (error) {
         console.error('Login error:', error);
 
@@ -65,5 +68,19 @@ export const loginUser = async (req, res) => {
         }
 
         res.status(500).send({ error: 'An error occurred while logging in.' });
+    }
+};
+
+export const getCurrentUser = async (req, res) => {
+    try {
+        // Fetch user from Firestore using uid from decoded token
+        const user = await getUserFromDB(req.user.uid);
+        if (user.error) {
+            return res.status(404).send(user);
+        }
+        res.send(user);
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        res.status(500).send({ error: 'An error occurred while fetching the user' });
     }
 };
