@@ -18,8 +18,8 @@ export const addDiagram = [ authMiddleware, async (req, res) => {
     }
 
     try {
-        const diagram = await addDiagramToDB(req.body);
-        res.status(200).send(diagram);
+        const diagram = await addDiagramToDB({ userId, name, description, likes, comments, sequence });
+        res.status(201).send({ message: 'Diagram created successfully', diagram });
     } catch (error) {
         console.error('Error adding diagram:', error);
         res.status(500).send({ error: 'An error occurred while adding the diagram' });
