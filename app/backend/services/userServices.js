@@ -18,7 +18,7 @@ export const loginUserToDB = async (username) => {
     try {
         // Query Firestore for a user with the provided username
         const userQuery = collection(db, 'users');
-        console.log('userQuery', userQuery)
+        //console.log('userQuery', userQuery)
         const q = query(userQuery, where('username', '==', username));
         const querySnapshot = await getDocs(q);
 
