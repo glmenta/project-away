@@ -24,6 +24,6 @@ export const addDiagramToDB = async (diagram) => {
         return diagram
     } catch (error) {
         console.error("Error adding document to Firestore:", error);
-        throw error;  // Re-throw the error so it can be caught in registerUser
+        throw error;
     }
 }

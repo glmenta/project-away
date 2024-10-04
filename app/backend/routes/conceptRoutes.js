@@ -3,6 +3,6 @@ import { getConceptsFromDB, addConceptToDB } from '../services/conceptServices.j
 
 const router = express.Router();
 
-router.get('/all-concepts', getConceptsFromDB);
-router.post('/new-concept', addConceptToDB);
+router.get('/all', getConceptsFromDB);
+router.post('/new', addConceptToDB);
 export default router

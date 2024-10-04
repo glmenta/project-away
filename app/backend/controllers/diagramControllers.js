@@ -1,10 +1,14 @@
-import { getAllDiagramsFromDB, addDiagramToDB } from "../services/diagramServices";
+import { getAllDiagramsFromDB, addDiagramToDB } from "../services/diagramServices.js";
 import authMiddleware from "../authMiddleware.js";
 
 export const getDiagrams = async (req, res) => {
     try {
         const diagrams = await getAllDiagramsFromDB();
+        if (!diagrams) {
+            return res.status(404).send({ error: 'No diagrams found' });
+        }
         res.send(diagrams);
+
     } catch (error) {
         console.error('error', error)
     }
