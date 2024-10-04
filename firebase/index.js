@@ -61,7 +61,7 @@ auth.onAuthStateChanged(async (user) => {
         try {
             const token = await user.getIdToken();  // Retrieve the JWT token
             console.log('User token:', token);
-            // Send token to the backend in request headers
+
             const response = await fetch('http://localhost:5000/api/current-user', {
                 method: 'GET',
                 headers: {
@@ -90,6 +90,7 @@ auth.onAuthStateChanged(async (user) => {
 
 
 export const authMiddleware = async (req, res, next) => {
+
     const token = req.headers.authorization?.split(' ')[1]; // Extract token from Authorization header
 
     if (!token) {

@@ -56,7 +56,20 @@ export const loginUser = async (req, res) => {
         if (!user) {
             return res.status(401).send({ error: 'Invalid credentials' });
         }
-        res.status(200).send({ message: 'User logged in successfully', user: user });
+
+        const idToken = await user.getIdToken();
+        console.log('idToken', idToken)
+
+        res.status(200).send({
+            message: 'User logged in successfully',
+            user: {
+                id: user.uid,
+                email: user.email,
+                username: dbUser.username
+            },
+            token: idToken
+        });
+
     } catch (error) {
         console.error('Login error:', error);
 
@@ -72,6 +85,7 @@ export const loginUser = async (req, res) => {
 };
 
 export const getCurrentUser = async (req, res) => {
+    console.log('req.body', req.body)
     try {
         // Fetch user from Firestore using uid from decoded token
         const user = await getUserFromDB(req.user.uid);
