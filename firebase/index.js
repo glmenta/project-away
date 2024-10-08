@@ -110,6 +110,7 @@ export const authMiddleware = async (req, res, next) => {
 
 
 export const verifyToken = async (req, res, next) => {
+        console.log('hit in verifyToken')
         const token = req.headers.authorization && req.headers.authorization.split('Bearer ')[1];
 
         if (!token) {
