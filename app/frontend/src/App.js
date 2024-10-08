@@ -1,7 +1,17 @@
 import logo from './logo.svg';
 import './App.css';
+import { UserContext } from './UserContext';
 
 function App() {
+  const { user, login, logout } = useContext(UserContext);
+
+  // const handleLogin = () => {
+  //   const userData = {
+  //     token: 'fetched-firebase-token',
+  //   };
+  //   login(userData);
+  // };
+
   return (
     <div className="App">
       <header className="App-header">
