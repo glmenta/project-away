@@ -37,19 +37,19 @@ export const db = getFirestore(app, 'pa-db');
 
 console.log('Firebase initialized with Firestore and Auth');
 
-const testConnection = async () => {
-    try {
-        const docRef = await addDoc(collection(db, 'users'), {
-            testField: 'testing again',
-            timestamp: new Date(),
-        });
-        console.log('Document written with ID: ', docRef.id);
-    } catch (error) {
-        console.error('Error writing document to Firestore: ', error);
-    }
-};
+// const testConnection = async () => {
+//     try {
+//         const docRef = await addDoc(collection(db, 'users'), {
+//             testField: 'testing again',
+//             timestamp: new Date(),
+//         });
+//         console.log('Document written with ID: ', docRef.id);
+//     } catch (error) {
+//         console.error('Error writing document to Firestore: ', error);
+//     }
+// };
 
-testConnection();
+//testConnection();
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -106,4 +106,22 @@ export const authMiddleware = async (req, res, next) => {
         console.error('Error verifying Firebase token:', error);
         return res.status(403).send({ error: 'Invalid or expired token.' });
     }
+};
+
+
+export const verifyToken = async (req, res, next) => {
+        const token = req.headers.authorization && req.headers.authorization.split('Bearer ')[1];
+
+        if (!token) {
+        return res.status(401).send({ error: 'Unauthorized, no token provided.' });
+        }
+
+        try {
+        const decodedToken = await admin.auth().verifyIdToken(token);
+        req.userId = decodedToken.uid;  // Attach userId to the request object
+        next();
+        } catch (error) {
+        console.error('Token verification error:', error);
+        return res.status(401).send({ error: 'Unauthorized, token verification failed.' });
+        }
 };
