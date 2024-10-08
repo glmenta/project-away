@@ -10,7 +10,8 @@ export const getConcepts = async (req, res) => {
 }
 
 export const addConcept = async (req, res) => {
-    const { userId, name, description, likes = 0, comments = [] } = req.body;
+    const { name, description, likes = 0, comments = [] } = req.body;
+    const userId = req.userId;
     try {
         const conceptId = await addConceptToDB({ userId, name, description, likes, comments });
         res.status(201).json({

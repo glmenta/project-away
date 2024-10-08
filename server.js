@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import userRoutes from './app/backend/routes/userRoutes.js';
 import authRoutes from './app/backend/routes/authRoutes.js';
 import diagramRoutes from './app/backend/routes/diagramRoutes.js';
+import conceptRoutes from './app/backend/routes/conceptRoutes.js';
 
 import { authMiddleware } from './firebase/index.js';
 const app = express();
@@ -12,6 +13,7 @@ const port = process.env.PORT || 5000;
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/diagrams', diagramRoutes);
+app.use('/api/concepts', conceptRoutes);
 
 app.get('/test', (req, res) => {
     console.log("Test route accessed");
