@@ -2,11 +2,21 @@ import { db } from "../../../firebase/index.js";
 import { collection, getDocs, addDoc, query, where } from "firebase/firestore";
 import { setLogLevel } from "firebase/firestore";
 
-export const addUserToDB = async (user) => {
+export const addUserToDB = async ({ uid, email,username, ign, main_position, skill_level, crew }) => {
     try {
         // Add user to the "users" collection in Firestore
-        const docRef = await addDoc(collection(db, "users"), user);
-        console.log("Document written with ID:", docRef.id);
+        await setDoc (doc(db, "users", uid), {
+            email,
+            username,
+            ign,
+            main_position,
+            skill_level,
+            crew,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        })
+
+        console.log("User added to Firestore");
     } catch (error) {
         console.error("Error adding document to Firestore:", error);
         throw error;  // Re-throw the error so it can be caught in registerUser
