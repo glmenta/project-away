@@ -111,3 +111,25 @@ export const getCurrentUser = async (req, res) => {
         res.status(500).send({ error: 'An error occurred while fetching the user' });
     }
 };
+
+export const authenticateUser = async (req, res, next) => {
+    const authorizationHeader = req.headers.authorization;
+
+    if (!authorizationHeader) {
+        return res.status(401).json({ message: 'No authorization header provided' });
+    }
+
+    const token = authorizationHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ message: 'No token provided' });
+    }
+
+    try {
+        const decodedToken = await admin.auth().verifyIdToken(token);
+        req.currentUser = decodedToken;
+        next();
+    } catch (error) {
+        return res.status(401).json({ message: 'Unauthorized', error: error.message });
+    }
+};
