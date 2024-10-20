@@ -24,6 +24,7 @@ export const registerUser = async (req, res) => {
         // Add user to Firestore
         await addUserToDB({
             uid: userId,
+            email,
             username,
             ign,
             main_position,
