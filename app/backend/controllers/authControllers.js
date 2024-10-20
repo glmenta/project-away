@@ -3,21 +3,33 @@ import { auth } from "../../../firebase/index.js";
 import { addUserToDB, loginUserToDB, getUsersFromDB, getUserFromDB } from "../services/userServices.js";
 
 export const registerUser = async (req, res) => {
-    const { email, password, username } = req.body;
+    const { email, password, username, ign, main_position, skill_level, crew } = req.body;
+
+    const validLevels = ['beginner', 'intermediate', 'advanced', 'expert'];
+    if (!validLevels.includes(skill_level)) {
+        return res.status(400).send({ error: 'Invalid skill level' });
+    }
+
+    if (!email || !password) {
+        return res.status(400).send({ error: 'Email and password are required.' });
+    }
+
     try {
         // Create the user with Firebase Authentication
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        console.log('User created:', user);
-
-        // Create user object to save in Firestore
-        const userObj = {
-            email: user.email,
-            username: username || 'default'
-        }
+        const userId = user.uid;
+        console.log('User created:', user, userId);
 
         // Add user to Firestore
-        await addUserToDB(userObj);
+        await addUserToDB({
+            uid: userId,
+            username,
+            ign,
+            main_position,
+            skill_level,
+            crew
+        });
 
         // Send success response
         res.status(201).send('User created successfully and added to Firestore.');
